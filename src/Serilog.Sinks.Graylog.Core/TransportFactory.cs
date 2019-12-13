@@ -64,7 +64,7 @@ namespace Serilog.Sinks.Graylog.Core
                 }
                 case SinkTransportType.Http:
                 {
-                    var httpClient = new HttpTransportClient($"{_options.HostnameOrAddress}:{_options.Port}/gelf");
+                    var httpClient = new HttpTransportClient($"{_options.HostnameOrAddress}:{_options.Port}/gelf", _options.HttpClientCertificatePath);
 
                     var httpTransport = new HttpTransport(httpClient);
                     return httpTransport;
