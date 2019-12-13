@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Serilog.Debugging;
 
@@ -11,10 +12,10 @@ namespace Serilog.Sinks.Graylog.Core.Transport.Http
         private readonly string _graylogUrl;
         private readonly HttpClient _httpClient;
 
-        public HttpTransportClient(string graylogUrl)
+        public HttpTransportClient(string graylogUrl, string certificatePath)
         {
             _graylogUrl = graylogUrl;
-            _httpClient = new HttpClient();
+            _httpClient = InitializeHttpClient(certificatePath);
             _httpClient.DefaultRequestHeaders.ExpectContinue = false;
             _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true };
         }
@@ -35,6 +36,26 @@ namespace Serilog.Sinks.Graylog.Core.Transport.Http
         public void Dispose()
         {
             _httpClient?.Dispose();
+        }
+
+        private HttpClient InitializeHttpClient(string certificatePath) =>
+            string.IsNullOrEmpty(certificatePath) ? new HttpClient() : CreateHttpClientWithCertificate(certificatePath);
+
+        private HttpClient CreateHttpClientWithCertificate(string certificatePath)
+        {
+            try
+            {
+                var handler = new HttpClientHandler();
+                var certificate = new X509Certificate2(certificatePath);
+                handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                handler.ClientCertificates.Add(certificate);
+
+                return new HttpClient(handler);
+            }
+            catch (Exception ex)
+            {
+                throw new LoggingFailedException(ex.Message);
+            }
         }
     }
 }
