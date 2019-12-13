@@ -40,6 +40,7 @@ namespace Serilog.Sinks.Graylog
         /// <param name="host">The host property to use in GELF message. If null, DNS hostname will be used instead.</param>
         /// <param name="includeMessageTemplate">if set to <c>true</c> if include message template to graylog.</param>
         /// <param name="messageTemplateFieldName">Name of the message template field.</param>
+        /// <param name="httpClientCertificatePath">Path to the TLS client certificate (pfx) for HTTP GELF endpoint.</param>
         /// <returns></returns>
         public static LoggerConfiguration Graylog(this LoggerSinkConfiguration loggerSinkConfiguration,
                                                   string hostnameOrAddress,
@@ -53,7 +54,8 @@ namespace Serilog.Sinks.Graylog
                                                   int maxMessageSizeInUdp = GraylogSinkOptionsBase.DefaultMaxMessageSizeInUdp,
                                                   string host = GraylogSinkOptionsBase.DefaultHost,
                                                   bool includeMessageTemplate = false,
-                                                  string messageTemplateFieldName = GraylogSinkOptionsBase.DefaultMessageTemplateFieldName
+                                                  string messageTemplateFieldName = GraylogSinkOptionsBase.DefaultMessageTemplateFieldName,
+                                                  string httpClientCertificatePath = ""
                                                   )
         {
             // ReSharper disable once UseObjectOrCollectionInitializer
@@ -70,6 +72,7 @@ namespace Serilog.Sinks.Graylog
             options.Host = host;
             options.IncludeMessageTemplate = includeMessageTemplate;
             options.MessageTemplateFieldName = messageTemplateFieldName;
+            options.HttpClientCertificatePath = httpClientCertificatePath;
             return loggerSinkConfiguration.Graylog(options);
         }
     }
